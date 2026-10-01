@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Car Icon Maker</title>
+<style>
+:root{--bg:#eef0f2;--ink:#1d2b33;--muted:#5d6b73;--panel:#fff;--line:#d3d8dc;--accent:#e0a100}
+@media (prefers-color-scheme:dark){:root{--bg:#14202a;--ink:#f1ede2;--muted:#9fb0ba;--panel:#1c2c38;--line:#2f4352}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;padding:20px}
+h1{margin:0 0 4px;font-size:1.5rem}
+.sub{margin:0 0 18px;color:var(--muted)}
+.wrap{display:flex;flex-wrap:wrap;gap:20px;max-width:880px}
+.preview{flex:1 1 300px;display:flex;align-items:center;justify-content:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:24px;min-height:340px;
+background-image:linear-gradient(45deg,rgba(128,128,128,.12) 25%,transparent 25%,transparent 75%,rgba(128,128,128,.12) 75%),linear-gradient(45deg,rgba(128,128,128,.12) 25%,transparent 25%,transparent 75%,rgba(128,128,128,.12) 75%);background-size:20px 20px;background-position:0 0,10px 10px}
+#icon{width:100%;max-width:280px;height:auto}
+.controls{flex:1 1 300px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px;align-content:start}
+label{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:.95rem}
+input[type=color]{width:56px;height:34px;border:1px solid var(--line);border-radius:6px;padding:2px;background:none}
+select,input[type=range]{min-width:140px}
+select{padding:6px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+button{flex:1;font:inherit;font-weight:700;border:0;border-radius:8px;padding:12px;background:var(--accent);color:#1d2b33;cursor:pointer}
+button.alt{background:var(--ink);color:var(--bg)}
+button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.sizes{display:flex;gap:12px;align-items:flex-end;margin-top:6px;color:var(--muted);font-size:.8rem}
+.sizes div{text-align:center}
+</style>
+</head>
+<body>
+<h1>Car Icon Maker</h1>
+<p class="sub">Style the icon, then download it as a PNG or SVG.</p>
+<div class="wrap">
+  <div class="preview"><svg id="icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Car icon"></svg></div>
+  <div class="controls">
+    <label>Background <input type="color" id="bg" value="#2f8f9d"></label>
+    <label>Road <input type="color" id="road" value="#3b4048"></label>
+    <label>Car color <input type="color" id="car" value="#e0a100"></label>
+    <label>Shape
+      <select id="shape"><option value="round">Rounded square</option><option value="circle">Circle</option><option value="square">Square</option></select>
+    </label>
+    <label>Lane markings <input type="checkbox" id="lanes" checked></label>
+    <label>Car tilt <input type="range" id="tilt" min="-25" max="25" value="0"></label>
+    <label>PNG size
+      <select id="size"><option>64</option><option>128</option><option>192</option><option selected>512</option><option>1024</option></select>
+    </label>
+    <div class="row"><button id="png">Download PNG</button><button class="alt" id="svg">Download SVG</button></div>
+    <div class="sizes" id="sizes"></div>
+  </div>
+</div>
+<script>
+(function(){
+var $=function(id){return document.getElementById(id)};
+var svg=$('icon');
+function build(){
+  var bg=$('bg').value,road=$('road').value,car=$('car').value,shape=$('shape').value,lanes=$('lanes').checked,tilt=$('tilt').value;
+  var clip=shape==='circle'?'<circle cx="256" cy="256" r="256"/>':shape==='round'?'<rect width="512" height="512" rx="110"/>':'<rect width="512" height="512"/>';
+  var s='<defs><clipPath id="cp">'+clip+'</clipPath></defs><g clip-path="url(#cp)">'
+   +'<rect width="512" height="512" fill="'+bg+'"/>'
+   +'<rect x="96" width="320" height="512" fill="'+road+'"/>'
+   +'<rect x="96" width="12" height="512" fill="#f2efe6"/><rect x="404" width="12" height="512" fill="#f2efe6"/>';
+  if(lanes){for(var y=-20;y<512;y+=110){s+='<rect x="250" y="'+y+'" width="12" height="56" rx="4" fill="#f2efe6"/>'}}
+  s+='<g transform="rotate('+tilt+' 256 270)">'
+   +'<rect x="176" y="162" width="14" height="46" rx="4" fill="#111"/><rect x="322" y="162" width="14" height="46" rx="4" fill="#111"/>'
+   +'<rect x="176" y="322" width="14" height="46" rx="4" fill="#111"/><rect x="322" y="322" width="14" height="46" rx="4" fill="#111"/>'
+   +'<rect x="190" y="130" width="132" height="252" rx="34" fill="'+car+'"/>'
+   +'<rect x="208" y="186" width="96" height="58" rx="12" fill="rgba(20,30,40,.85)"/>'
+   +'<rect x="208" y="312" width="96" height="40" rx="10" fill="rgba(20,30,40,.7)"/>'
+   +'<rect x="252" y="248" width="8" height="58" fill="rgba(255,255,255,.25)"/>'
+   +'<rect x="204" y="136" width="30" height="12" rx="5" fill="#fff6c2"/><rect x="278" y="136" width="30" height="12" rx="5" fill="#fff6c2"/>'
+   +'</g></g>';
+  svg.innerHTML=s;
+  var sz=$('sizes');sz.innerHTML='';
+  [16,32,64].forEach(function(n){var d=document.createElement('div');var c=document.createElement('canvas');c.width=n;c.height=n;c.style.width=n+'px';c.style.height=n+'px';d.appendChild(c);d.appendChild(document.createElement('br'));d.appendChild(document.createTextNode(n+' px'));sz.appendChild(d);render(n,function(img){c.getContext('2d').drawImage(img,0,0,n,n)})});
+}
+function source(){
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">'+svg.innerHTML+'</svg>';
+}
+function render(n,cb){
+  var img=new Image();
+  img.onload=function(){cb(img)};
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(source());
+}
+function save(href,name){var a=document.createElement('a');a.href=href;a.download=name;document.body.appendChild(a);a.click();a.remove()}
+$('png').addEventListener('click',function(){
+  var n=parseInt($('size').value,10);
+  render(n,function(img){var c=document.createElement('canvas');c.width=n;c.height=n;c.getContext('2d').drawImage(img,0,0,n,n);save(c.toDataURL('image/png'),'car-icon-'+n+'.png')});
+});
+$('svg').addEventListener('click',function(){
+  var u=URL.createObjectURL(new Blob([source()],{type:'image/svg+xml'}));save(u,'car-icon.svg');setTimeout(function(){URL.revokeObjectURL(u)},1000);
+});
+['bg','road','car','shape','lanes','tilt'].forEach(function(id){$(id).addEventListener('input',build)});
+build();
+})();
+</script>
+</body>
+</html>
